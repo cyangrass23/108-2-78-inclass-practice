@@ -1,0 +1,33 @@
+{
+    "collab_server" : "",
+    "contents" : "",
+    "created" : 1584517719621.000,
+    "dirty" : false,
+    "encoding" : "",
+    "folds" : "",
+    "hash" : "0",
+    "id" : "4C79DBF4",
+    "lastKnownWriteTime" : 2318265438588531822,
+    "last_content_update" : 1584517719621,
+    "path" : null,
+    "project_path" : null,
+    "properties" : {
+        "cacheKey" : "F4F6198",
+        "caption" : "exDataPost80s",
+        "contentUrl" : "grid_resource/gridviewer.html?env=&obj=exDataPost80s&cache_key=F4F6198",
+        "displayedObservations" : 2325,
+        "environment" : "",
+        "expression" : "exDataPost80s",
+        "object" : "exDataPost80s",
+        "preview" : 0,
+        "totalObservations" : 2325,
+        "variables" : 6
+    },
+    "read_only" : false,
+    "read_only_alternatives" : [
+    ],
+    "relative_order" : 4,
+    "source_on_save" : false,
+    "source_window" : "",
+    "type" : "r_dataframe"
+}
