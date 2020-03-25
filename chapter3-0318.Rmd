@@ -128,3 +128,4 @@ logi1<-c(T,TRUE,F,FALSE,FALSE)
 sum(logi1)
 ```
 
+
