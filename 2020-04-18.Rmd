@@ -1,0 +1,272 @@
+---
+title: "Untitled"
+author: "黃湘涵"
+date: "2020/4/18"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+
+```{r}
+listExample <- 
+  list(
+    student="小明",
+    `學期`=list(
+      `108-1`=list(
+        list(
+          name="個體經濟學",
+          teacher="Alice",
+          grade=85
+        )
+      ),
+      `108-2`=list(
+        list(
+          name="總體經濟學",
+          teacher="Mark",
+          grade=78
+        )
+      )
+    )
+  )
+# 有多少位置可選：
+length(listExample)
+```
+###get1取出
+```{r}
+get1 <- listExample[["學期"]]
+get1 <- listExample$`學期`
+get2 <- listExample["學期"]
+```
+
+```{r}
+get1 <- listExample[["學期"]]
+get1$`108-1` -> get1_layer1
+get1_layer1[[1]] -> get1_layer2
+get1_layer2$teacher
+
+get1$`108-1`[[1]]$teacher
+listExample[["學期"]]$`108-1`[[1]]$teacher
+```
+###get2取出
+```{r}
+listExample["學期"]->get2
+get2[[1]]->get2_layer1
+get2_layer1$`108-1`->get2_layer2
+get2_layer2[[1]]->get2_layer3
+get2_layer3$teacher
+
+listExample["學期"][[1]]$`108-1`[[1]]$teacher
+```
+
+####list應用
+```{r}
+vector1<-c(a=1,b=3,c=4)
+vector1[["a"]]
+vector1[c("a","c")]
+vector$a #list才能使用$符號
+```
+```{r}
+list1<-list(a=1,b=3,c=4)
+list1[["a"]]
+list1[c("a","c")]
+list1$a
+```
+
+```{r}
+today <- list(
+  list("台北市",c(highest_temp = 25),c(lowest_temp = 18)),
+  list("新北市",c(highest_temp = 24),c(lowest_temp = 15)))
+```
+
+```{r}
+#修改寫法 使之可以$號取出
+today <- list(
+  list("台北市",
+       highestemp=c(highest_temp = 25),
+       lowest_temp=c(lowest_temp = 18)),
+  list("新北市",
+       highest_temp=c(highest_temp = 24),
+       lowest_temp=c(lowest_temp = 15)))
+today[[1]][[2]]
+today[[1]]$highestemp
+```
+
+####新增/替換/刪除元素
+
+**範例
+```{r}
+a <- c("1","b","TRUE")
+a
+a[[2]]<-"c"
+a[[4]]<-"7"
+a[c(5,6)]<-c("J","K")
+a[[7]]<-"johnson"
+a <- c(a,"Mary")
+a
+```
+
+```{r}
+library(lubridate)
+list1 <- 
+  list(
+    list(
+      name="Jack",
+      birthday=ymd("1998-03-21"),
+      status=c(height=177, weight=80)
+    )
+  )
+
+str(list1)
+```
+
+```{r}
+# 更改日期
+list1[[1]]$birthday <- ymd("1997-03-21")
+
+# 新增資料
+list1[[2]] <- list(
+  name="Mary",
+  birthday=ymd("1998-08-24")
+)
+
+str(list1)
+```
+
+```{r}
+list1[[2]]$status<- c(height=163,weight=45)
+list1[[1]]$status<-c(height=176,80)
+str(list1)
+```
+```{r}
+list1[[1]][["age"]] <- 21
+list1[[2]]["age"] <- list(21)
+
+# 改變「一個」時，使用[[ ]]比較不會錯。
+str(list1)
+```
+```{r}
+list1[[1]][c("bloodtype","registered")]<-list("AB",TRUE)
+list1
+```
+
+##exercise
+```{r}
+listExample <- 
+  list(
+    student="小明",
+    `學期`=list(
+      `108-1`=list(
+        list(
+          name="個體經濟學",
+          teacher="Alice",
+          grade=85
+        )
+      ),
+      `108-2`=list(
+        list(
+          name="總體經濟學",
+          teacher="Mark",
+          grade=78
+        )
+      )
+    )
+  )
+str(listExample)
+```
+
+```{r}
+listExample[[2]]$`108-1`[[2]]<-list(name="產業經濟學")
+str(listExample)
+```
+
+```{r}
+listExample[[2]]$`108-1`[[2]][c("teacner","grade")]<-list("Wen",88)
+str(listExample)
+```
+```{r}
+a<-c("1","c","TRUE","7","J","K","johnson")
+print(a)
+a[-c(1,3)]
+a[c(-2)]
+
+print(a)
+a[-c(1,3)] -> a # 要回存才算真的刪除
+print(a)
+```
+
+```{r}
+library(lubridate)
+list1 <- 
+  list(
+    list(
+      name="Jack",
+      birthday=ymd("1998-03-21"),
+      status=c(height=177, weight=80)
+    ),
+    list(
+      name="Mary",
+      birthday=ymd("1998-08-24"),
+      status=c(height=163, weight=45),
+      age=21,
+      bloodType="AB"
+    )
+  )
+str(list1)
+```
+```{r}
+list1[[1]][-3]->list1[[1]]
+list1[[2]][-c(3,5)]->list1[[2]]
+str(list1)
+```
+```{r}
+str(list1)
+list1[[2]][c(1,2)] <- NULL
+str(list1)
+```
+```{r}
+library(jsonlite)
+fromJSON("https://data.ntpc.gov.tw/od/data/api/54DDDC93-589C-4858-9C95-18B2046CC1FC?$format=json", simplifyDataFrame = F) -> newTaipeiYouBike
+```
+
+```{r}
+#方法1
+newTaipeiYouBike[-5] -> newTaipeiYouBike
+str(newTaipeiYouBike,max.level = 1)
+#方法2
+newTaipeiYouBike[[1]] <- NULL
+str(newTaipeiYouBike,max.level = 1)
+```
+
+
+
+
+
+
+
+
+
+
+
+
