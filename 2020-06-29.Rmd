@@ -1,0 +1,497 @@
+---
+title: '2020-06-29'
+author: "黃湘涵"
+date: "2020/6/28"
+output: html_document
+editor_options: 
+  chunk_output_type: console
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## R Markdown
+
+This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
+
+When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
+
+```{r cars}
+summary(cars)
+```
+
+## Including Plots
+
+You can also embed plots, for example:
+
+```{r pressure, echo=FALSE}
+plot(pressure)
+```
+
+Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+5.4 Iteration
+```{r}
+library(purrr)
+```
+
+```{r}
+sampleData <- list(
+  list("男", 45), list("女", 32), list("男",50), list("男",33), list("女", 21)
+)
+```
+
+
+
+```{r}
+# 前三筆性別
+sampleData[[1]][[1]]
+sampleData[[2]][[1]]
+sampleData[[3]][[1]]
+```
+
+```{r}
+# 串接寫法(I): external dispatch
+sample[[1]] %>% {.[[1]]}
+sampleData[[2]] %>% {.[[1]]}
+sampleData[[3]] %>% {.[[1]]}
+
+map(sampleData,~{.x[[1]]})
+# 串接寫法(II): internal dispatch
+1 %>% sampleData[[.]][[1]]
+2 %>% sampleData[[.]][[1]]
+3 %>% sampleData[[.]][[1]]
+
+map(1:5,~sampleData[[.x]][[1]])
+```
+
+```{r}
+eggs <- rep("雞蛋x1", 8)
+
+fryEgg <- function(egg){
+  str_replace(egg, "雞蛋", "荷包蛋")
+}
+
+# external dispatch
+eggs[[1]] %>% fryEgg(.)
+eggs[[2]] %>% fryEgg(.)
+eggs[[3]] %>% fryEgg(.)
+
+map(eggs, ~fryEgg(.x)) -> friedEggs1
+
+# internal dispatch
+1 %>% {fryEgg(eggs[[.]])}
+2 %>% {fryEgg(eggs[[.]])}
+3 %>% {fryEgg(eggs[[.]])}
+
+map(1:8, ~{fryEgg(eggs[[.]])}) -> friedEggs2
+```
+vectorized function
+```{r}
+grade <- c(45, 74, NA)
+
+i<-3
+
+grade_i <- grade[[i]]
+if(!is.na(grade_i)){
+  if(grade_i >= 60){
+    "P"
+  } else{
+    "F"
+  }
+} else {
+  "缺考"
+}
+```
+
+```{r}
+pass_or_fail <- function(grade_i){
+  if(!is.na(grade_i)){
+  if(grade_i >= 60){
+    "P"
+  } else{
+    "F"
+  }
+} else {
+  "缺考"
+}
+}
+pass_or_fail(grade[[1]])
+pass_or_fail(grade[[2]])
+pass_or_fail(grade[[3]])
+# 可否直接input整個grade vector
+pass_or_fail(grade)
+```
+
+```{r}
+grade[[1]] %>% pass_or_fail(.)
+grade[[2]] %>% pass_or_fail(.)
+grade[[3]] %>% pass_or_fail(.)
+
+map(grade,~pass_or_fail(.x))
+map_chr(grade,~pass_or_fail(.x))
+
+map_pass_fail <- function(grade){
+  map_chr(grade,~pass_or_fail(.x))
+}
+map_pass_fail(grade)
+```
+Internal dispatching的優勢
+```{r}
+eggs <- rep("雞蛋x1",10)
+ham <- rep("火腿x1", 10)
+toast <- rep("土司2片",10)
+
+toast_withEggHam <- function(toast=NULL, egg=NULL, ham=NULL){
+  if(is.null(toast) || !str_detect(toast, "土司")){stop("少了土司")}
+  if(is.null(egg) || !str_detect(egg, "蛋")){stop("少了蛋")}
+  if(is.null(ham) || !str_detect(ham, "火腿")){stop("少了火腿")}
+  "火腿蛋三明治"
+}
+
+# 土司、火腿、蛋 第一份出列
+1 %>% {toast_withEggHam(toast=toast[[.]], egg=eggs[[.]], ham=ham[[.]])}
+# 土司、火腿、蛋 第二份出列
+2 %>% {toast_withEggHam(toast=toast[[.]], egg=eggs[[.]], ham=ham[[.]])}
+# 土司、火腿、蛋 第三份出列
+3 %>% {toast_withEggHam(toast=toast[[.]], egg=eggs[[.]], ham=ham[[.]])}
+
+map_chr(1:10,~{toast_withEggHam(toast=toast[[.x]], egg=eggs[[.x]], ham=ham[[.x]])})
+```
+
+```{r}
+jsonlite::fromJSON("https://www.dropbox.com/s/7myzzdnoor21hye/courseStructure2.json?dl=1") -> courseStructure
+```
+
+```{r}
+entranceYear <- 100
+major <- "經濟系"
+allGrades <- paste0(major,1:4)
+academic <- entranceYear+0:3
+```
+
+```{r}
+acadYear_i <- academic[[1]]
+grade_i <- allGrades[[1]]
+pick <- (courseStructure$`學年`==acadYear1 &
+        str_detect(courseStructure$`應修系級`,grade_i))
+unique(courseStructure$`科目名稱`[pick])
+
+acadYear_i<- academic[[2]]
+grade_i <- allGrades[[2]]
+pick <- (courseStructure$`學年`==acadYear1 &
+        str_detect(courseStructure$`應修系級`,grade_i))
+unique(courseStructure$`科目名稱`[pick])
+#.....3&4
+
+get_courses <- function(acadYear_i,grade_i,courseStructure){
+  pick <- (courseStructure$`學年`==acadYear_i &
+        str_detect(courseStructure$`應修系級`,grade_i))
+unique(courseStructure$`科目名稱`[pick])
+}
+```
+
+```{r}
+# 100學年 1年級
+acadYear_i <- academic[[1]]
+grade_i <- allGrades[[1]]
+get_courses(acadYear_i, grade_i, courseStructure)
+
+# 101學年 2年級
+acadYear_i <- academic[[2]]
+grade_i <- allGrades[[2]]
+get_courses(acadYear_i, grade_i, courseStructure)
+
+# 102學年 3年級
+acadYear_i <- academic[[3]]
+grade_i <- allGrades[[3]]
+get_courses(acadYear_i, grade_i, courseStructure)
+
+# 103學年 4年級
+acadYear_i <- academic[[4]]
+grade_i <- allGrades[[4]]
+get_courses(acadYear_i, grade_i, courseStructure)
+```
+
+```{r}
+get_courses(academic[[1]], allGrades[[1]], courseStructure)
+get_courses(academic[[2]],allGrades[[2]],courseStructure)
+#...
+
+map(1:4,~get_courses(academic[[.x]], allGrades[[.x]], courseStructure))
+```
+for loop
+```{r}
+output <- vector("{type}", length={len})
+for(.x in {sequence}){
+  {body}
+}
+```
+
+```{r}
+### 前置作業
+entranceYear <- 100
+major <- "經濟系"
+allGrades <- paste0(major, 1:4)
+academicYears <- entranceYear+0:3
+
+jsonlite::fromJSON("https://www.dropbox.com/s/7myzzdnoor21hye/courseStructure2.json?dl=1") -> courseStructure
+
+get_courses <- function(acadYear_i, grade_i, courseStructure){
+  pick <-
+  (courseStructure$學年==acadYear_i 
+    &
+    str_detect(courseStructure$應修系級, grade_i))
+  
+  return(
+    unique(courseStructure$科目名稱[pick])
+  )
+}
+```
+
+```{r}
+# 前置作業，接map iteration
+library(purrr)
+library(stringr)
+map(1:4, 
+    ~{
+      get_courses(academicYears[[.x]], 
+              allGrades[[.x]], 
+              courseStructure)})
+```
+
+```{r}
+output <- vector("list", length = 4)
+for(.x in 1:4){
+  get_courses(academicYears[[.x]], 
+              allGrades[[.x]], 
+              courseStructure) -> output[[.x]]
+}
+```
+
+```{r}
+eggs <- rep("雞蛋x1",10)
+ham <- rep("火腿x1", 10)
+toast <- rep("土司2片",10)
+
+toast_withEggHam <- function(toast=NULL, egg=NULL, ham=NULL){
+  if(is.null(toast) || !str_detect(toast, "土司")){stop("少了土司")}
+  if(is.null(egg) || !str_detect(egg, "蛋")){stop("少了蛋")}
+  if(is.null(ham) || !str_detect(ham, "火腿")){stop("少了火腿")}
+  "火腿蛋三明治"
+}
+```
+
+```{r}
+map(1:10,
+    ~toast_withEggHam(toast=toast[[.x]], egg=eggs[[.x]], ham=ham[[.x]]))
+```
+for approach
+```{r}
+output <- vector("character",10)
+for(.x in 1:10){
+  toast_withEggHam(toast=toast[[.x]], egg=eggs[[.x]], ham=ham[[.x]]) -> output[[.x]]
+}
+```
+累計型output
+```{r}
+a <- sample(1:100, 10, replace=T)
+print(a)
+```
+Sequence: 1:10
+
+body: 到目前sequence .x前已經加總的值+ a[[.x]]
+
+output: .x到10最後算完的值。
+```{r}
+1 %>% {sum <- 0
+sum <- sum + a[[.]]}
+sum <- sum + a[[2]]
+
+sum <- 0
+for(.x in 1:10){
+  sum <- sum + a[[.x]]
+}
+print(sum)
+```
+長度不定型output
+```{r}
+output <- c()
+for(.x in 1:10){
+  new <- sample(0:100,1)
+  if(new%%3==0){
+    output <- c(output,new)
+  }
+}
+print(output)
+```
+next
+```{r}
+
+for(.x in seq_along(collectionHWs)){
+  nameVector[[.x]] <- collectionHWs[[.x]][[1]]
+  studentAns <- collectionHWs[[.x]][[2]]
+  if(is.na(studentAns)){
+    output[[.x]] <- 0
+    next
+  }
+  
+  if(identical(studentAns,correctAns)){
+    output[[.x]] <- 10
+  }else if(class(studentAns)!=class(correctAns) &&
+           identical(as.character(studentAns),as.character(correctAns))){
+    output[[.x]] <- 5
+  }else {
+    output <- 0
+  }
+}
+names(output) <- nameVector
+
+print(output)
+```
+
+
+```{r}
+list(
+  list("student A", c(2,3,4,5)),
+  list("student B", NA), # 沒交作業
+  list("student C", factor(c(2,3,4,5))),
+  list("student D", factor(c(2,3,5)))
+) -> collectionHWs
+
+correctAns <- factor(c(2,3,4,5))
+
+output <- vector("integer",length(collectionHWs))
+nameVector <- vector("character",length(collectionHWs))
+for(.x in seq_along(collectionHWs)){
+  nameVector[[.x]] <- collectionHWs[[.x]][[1]]
+  studentAns <- collectionHWs[[.x]][[2]] 
+  if(is.na(studentAns)){
+    output[[.x]] <- 0
+    next
+  } 
+  
+  # 改題部份
+  if(identical(studentAns, correctAns)){
+    output[[.x]] <- 10
+  } else if (class(studentAns)!=class(correctAns) && identical(as.character(studentAns),as.character(correctAns))) {
+    output[[.x]] <- 5
+  } else {
+    output[[.x]] <- 0
+  }
+}
+names(output) <- nameVector
+
+print(output)
+```
+將body的改題部份另外寫成grade(studentAns, correctAns)函數，讓它改完後回傳分數值，並重寫上面迴圈使用你的grade函數。
+```{r}
+for(.x in seq_along(collectionHWs)){
+  nameVector[[.x]] <- collectionHWs[[.x]][[1]]
+  studentAns <- collectionHWs[[.x]][[2]] 
+  if(is.na(studentAns)){
+    output[[.x]] <- 0
+    next
+  } 
+  
+  # 改題部份
+  grade <- function(studentAns,correctAns){
+  if(identical(studentAns, correctAns)){
+    output[[.x]] <- 10
+  } else if (class(studentAns)!=class(correctAns) && identical(as.character(studentAns),as.character(correctAns))) {
+    output[[.x]] <- 5
+  } else {
+    output[[.x]] <- 0
+  }
+}
+print(output)
+```
+
+```{r}
+sum <- 0
+for(i in 1:10){
+  newToss <- sample(c("正","反"), 1, replace=T)
+  if(newToss == "正"){
+    sum <- sum+1
+  }
+  print(glue::glue("已擲{i}次得到{sum}次正面"))
+}
+```
+
+```{r}
+sum <- 0
+count <- 0
+for(i in 1:100){
+  newToss <- sample(c("正","反"),1,replace=T)
+  count <- count+1
+  if(newToss == "正"){
+    sum <- sum+1
+  }
+   print(glue::glue("已擲{i}次得到{sum}次正面"))
+   if(sum == 5){
+     break
+   }
+}
+```
+while loop
+```{r}
+while(continueCondition){
+  body
+}
+```
+
+```{r}
+sum <- 0
+count <- 0
+while(sum <=5){
+  newToss <- sample(c("正","反"),1,replace=T)
+  count <- count+1
+  if(newToss == "正"){
+    sum <- sum+1
+  }
+   print(glue::glue("已擲{i}次得到{sum}次正面"))
+}
+```
+
+```{r}
+count <- 0 # 計數器開始值
+max_count <- 500 # 計數上限
+while(continueCondition && count <= max_count){ # 增加計數上限條件
+  count <- count+1 # 計數器加1
+  body
+}
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
